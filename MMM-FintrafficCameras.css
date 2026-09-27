@@ -1,0 +1,17 @@
+.mmm-fintraffic-cameras {
+	text-align: center;
+}
+
+.mmm-fintraffic-cameras__button {
+	padding: 8px 14px;
+	border: 1px solid #666;
+	border-radius: 4px;
+	background: #222;
+	color: #fff;
+	font: inherit;
+	cursor: pointer;
+}
+
+.mmm-fintraffic-cameras__button:hover {
+	background: #333;
+}
