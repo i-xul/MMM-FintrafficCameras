@@ -172,6 +172,38 @@ Module.register("MMM-FintrafficCameras", {
 		return container;
 	},
 
+	formatWeatherValue (value) {
+		if (typeof value !== "number") {
+			return value;
+		}
+
+		return value.toLocaleString("fi-FI", {
+			maximumFractionDigits: 1
+		});
+	},
+
+	formatWindDirection (degrees) {
+		if (degrees === null || degrees === undefined) {
+			return null;
+		}
+
+		const directions = [
+			"N",
+			"NE",
+			"E",
+			"SE",
+			"S",
+			"SW",
+			"W",
+			"NW"
+		];
+
+		const normalizedDegrees = ((degrees % 360) + 360) % 360;
+		const index = Math.round(normalizedDegrees / 45) % directions.length;
+
+		return `${this.formatWeatherValue(degrees)}° (${directions[index]})`;
+	},
+
 	createWeatherPanel (weather) {
 		const panel = document.createElement("div");
 		panel.className = "mmm-fintraffic-cameras__weather";
@@ -189,7 +221,7 @@ Module.register("MMM-FintrafficCameras", {
 			["Tienpinta", weather.roadTemperature, "°C"],
 			["Tuuli", weather.windSpeed, "m/s"],
 			["Puuska", weather.windGust, "m/s"],
-			["Tuulensuunta", weather.windDirection, "°"],
+			["Tuulensuunta", this.formatWindDirection(weather.windDirection), ""],
 			["Sade", weather.precipitationIntensity, "mm/h"],
 			["Sateen olomuoto", weather.precipitationType, ""],
 			["Näkyvyys", weather.visibility, "km"],
@@ -210,7 +242,10 @@ Module.register("MMM-FintrafficCameras", {
 
 			const valueElement = document.createElement("div");
 			valueElement.className = "mmm-fintraffic-cameras__weather-value";
-			valueElement.textContent = unit ? `${value} ${unit}` : value;
+			const formattedValue = this.formatWeatherValue(value);
+			valueElement.textContent = unit
+				? `${formattedValue} ${unit}`
+				: formattedValue;
 
 			item.appendChild(labelElement);
 			item.appendChild(valueElement);
@@ -218,6 +253,22 @@ Module.register("MMM-FintrafficCameras", {
 		});
 
 		panel.appendChild(grid);
+
+		if (weather.dataUpdatedTime) {
+			const updated = document.createElement("div");
+			updated.className = "mmm-fintraffic-cameras__weather-updated";
+
+			const updatedTime = new Date(weather.dataUpdatedTime);
+
+			updated.textContent = `Päivitetty ${updatedTime.toLocaleString("fi-FI", {
+				day: "2-digit",
+				month: "2-digit",
+				hour: "2-digit",
+				minute: "2-digit"
+			})}`;
+
+			panel.appendChild(updated);
+		}
 
 		return panel;
 	},

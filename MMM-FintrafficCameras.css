@@ -143,3 +143,10 @@
         font-size: 20px;
         font-weight: bold;
 }
+
+.mmm-fintraffic-cameras__weather-updated {
+        margin-top: 12px;
+        color: #777;
+        font-size: 14px;
+        text-align: right;
+}
