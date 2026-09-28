@@ -165,7 +165,61 @@ Module.register("MMM-FintrafficCameras", {
 			container.appendChild(image);
 		}
 
+		if (camera.weather) {
+			container.appendChild(this.createWeatherPanel(camera.weather));
+		}
+
 		return container;
+	},
+
+	createWeatherPanel (weather) {
+		const panel = document.createElement("div");
+		panel.className = "mmm-fintraffic-cameras__weather";
+
+		const title = document.createElement("div");
+		title.className = "mmm-fintraffic-cameras__weather-title";
+		title.textContent = "Tiesää";
+		panel.appendChild(title);
+
+		const grid = document.createElement("div");
+		grid.className = "mmm-fintraffic-cameras__weather-grid";
+
+		const measurements = [
+			["Ilma", weather.airTemperature, "°C"],
+			["Tienpinta", weather.roadTemperature, "°C"],
+			["Tuuli", weather.windSpeed, "m/s"],
+			["Puuska", weather.windGust, "m/s"],
+			["Tuulensuunta", weather.windDirection, "°"],
+			["Sade", weather.precipitationIntensity, "mm/h"],
+			["Sateen olomuoto", weather.precipitationType, ""],
+			["Näkyvyys", weather.visibility, "km"],
+			["Sade 24 h", weather.precipitation24h, "mm"]
+		];
+
+		measurements.forEach(([label, value, unit]) => {
+			if (value === null || value === undefined) {
+				return;
+			}
+
+			const item = document.createElement("div");
+			item.className = "mmm-fintraffic-cameras__weather-item";
+
+			const labelElement = document.createElement("div");
+			labelElement.className = "mmm-fintraffic-cameras__weather-label";
+			labelElement.textContent = label;
+
+			const valueElement = document.createElement("div");
+			valueElement.className = "mmm-fintraffic-cameras__weather-value";
+			valueElement.textContent = unit ? `${value} ${unit}` : value;
+
+			item.appendChild(labelElement);
+			item.appendChild(valueElement);
+			grid.appendChild(item);
+		});
+
+		panel.appendChild(grid);
+
+		return panel;
 	},
 
 	socketNotificationReceived (notification, payload) {
