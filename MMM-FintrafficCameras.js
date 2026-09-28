@@ -17,6 +17,7 @@ Module.register("MMM-FintrafficCameras", {
 
 		this.overlayOpen = false;
 		this.cameraData = null;
+		this.selectedCameraId = null;
 		this.selectedPresetId = null;
 		this.errorMessage = null;
 	},
@@ -50,6 +51,7 @@ Module.register("MMM-FintrafficCameras", {
 	openOverlay () {
 		this.overlayOpen = true;
 		this.cameraData = null;
+		this.selectedCameraId = null;
 		this.selectedPresetId = null;
 		this.errorMessage = null;
 
@@ -104,12 +106,78 @@ Module.register("MMM-FintrafficCameras", {
 		return overlay;
 	},
 
+	getCameraConfig (cameraId) {
+		return this.config.cameras.find((camera) => (
+			typeof camera === "string"
+				? camera === cameraId
+				: camera.id === cameraId
+		));
+	},
+
+	createCameraSelector (cameras) {
+		const selector = document.createElement("div");
+		selector.className = "mmm-fintraffic-cameras__camera-selector";
+
+		cameras.forEach((camera) => {
+			const cameraButton = document.createElement("button");
+			cameraButton.type = "button";
+			cameraButton.className = "mmm-fintraffic-cameras__camera-button";
+
+			const cameraConfig = this.getCameraConfig(camera.id);
+			cameraButton.textContent =
+				typeof cameraConfig === "object" && cameraConfig?.label
+					? cameraConfig.label
+					: camera.name;
+
+			if (camera.id === this.selectedCameraId) {
+				cameraButton.classList.add(
+					"mmm-fintraffic-cameras__camera-button--active"
+				);
+			}
+
+			cameraButton.addEventListener("click", () => {
+				if (camera.id === this.selectedCameraId) {
+					return;
+				}
+
+				this.selectedCameraId = camera.id;
+				this.selectedPresetId = null;
+				this.updateDom();
+			});
+
+			selector.appendChild(cameraButton);
+		});
+
+		return selector;
+	},
+
 	createCameraView () {
-		const camera = this.cameraData.cameras[0];
+		const cameras = this.cameraData.cameras;
 		const container = document.createElement("div");
 
-		if (!camera) {
+		if (!cameras.length) {
 			container.textContent = "Kameroita ei löytynyt.";
+			return container;
+		}
+
+		if (
+			!this.selectedCameraId ||
+			!cameras.some((camera) => camera.id === this.selectedCameraId)
+		) {
+			this.selectedCameraId = cameras[0].id;
+			this.selectedPresetId = null;
+		}
+
+		if (cameras.length > 1) {
+			container.appendChild(this.createCameraSelector(cameras));
+		}
+
+		const camera = cameras.find(
+			(item) => item.id === this.selectedCameraId
+		);
+
+		if (!camera) {
+			container.textContent = "Valittua kameraa ei löytynyt.";
 			return container;
 		}
 
@@ -120,12 +188,23 @@ Module.register("MMM-FintrafficCameras", {
 
 		if (!camera.presets.length) {
 			const noPresets = document.createElement("div");
-			noPresets.textContent = "Kameralla ei ole käytettävissä olevia kuvakulmia.";
+			noPresets.textContent =
+				"Kameralla ei ole käytettävissä olevia kuvakulmia.";
 			container.appendChild(noPresets);
+
+			if (camera.weather) {
+				container.appendChild(this.createWeatherPanel(camera.weather));
+			}
+
 			return container;
 		}
 
-		if (!this.selectedPresetId) {
+		if (
+			!this.selectedPresetId ||
+			!camera.presets.some(
+				(preset) => preset.id === this.selectedPresetId
+			)
+		) {
 			this.selectedPresetId = camera.presets[0].id;
 		}
 
@@ -139,7 +218,9 @@ Module.register("MMM-FintrafficCameras", {
 			presetButton.textContent = preset.name;
 
 			if (preset.id === this.selectedPresetId) {
-				presetButton.classList.add("mmm-fintraffic-cameras__preset-button--active");
+				presetButton.classList.add(
+					"mmm-fintraffic-cameras__preset-button--active"
+				);
 			}
 
 			presetButton.addEventListener("click", () => {
@@ -282,7 +363,8 @@ Module.register("MMM-FintrafficCameras", {
 
 		if (notification === "FINTRAFFIC_CAMERAS_ERROR") {
 			this.cameraData = null;
-			this.errorMessage = `Kameratietojen lataaminen epäonnistui: ${payload.message}`;
+			this.errorMessage =
+				`Kameratietojen lataaminen epäonnistui: ${payload.message}`;
 			this.updateDom();
 		}
 	}

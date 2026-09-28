@@ -21,7 +21,17 @@ module.exports = NodeHelper.create({
 			return;
 		}
 
-		const cameraIds = payload.cameras;
+		const cameraConfigs = Array.isArray(payload.cameras)
+			? payload.cameras
+			: [];
+
+		const cameraIds = cameraConfigs
+			.map((camera) => (
+				typeof camera === "string"
+					? camera
+					: camera?.id
+			))
+			.filter(Boolean);
 
 		Log.info(
 			`MMM-FintrafficCameras: camera data requested for ${cameraIds.length} station(s)`
