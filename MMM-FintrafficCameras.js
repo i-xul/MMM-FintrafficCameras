@@ -9,7 +9,9 @@
 
 Module.register("MMM-FintrafficCameras", {
 	defaults: {
-		cameras: []
+		cameras: [],
+		imageRefreshInterval: 60 * 1000,
+		dataRefreshInterval: 5 * 60 * 1000
 	},
 
 	start () {
@@ -20,6 +22,8 @@ Module.register("MMM-FintrafficCameras", {
 		this.selectedCameraId = null;
 		this.selectedPresetId = null;
 		this.errorMessage = null;
+		this.imageRefreshTimer = null;
+		this.dataRefreshTimer = null;
 	},
 
 	getStyles () {
@@ -49,6 +53,10 @@ Module.register("MMM-FintrafficCameras", {
 	},
 
 	openOverlay () {
+		if (this.overlayOpen) {
+			return;
+		}
+
 		this.overlayOpen = true;
 		this.cameraData = null;
 		this.selectedCameraId = null;
@@ -59,12 +67,82 @@ Module.register("MMM-FintrafficCameras", {
 			cameras: this.config.cameras
 		});
 
+		this.startImageRefresh();
+		this.startDataRefresh();
 		this.updateDom();
 	},
 
 	closeOverlay () {
 		this.overlayOpen = false;
+		this.stopImageRefresh();
+		this.stopDataRefresh();
 		this.updateDom();
+	},
+
+	startImageRefresh () {
+		this.stopImageRefresh();
+
+		if (this.config.imageRefreshInterval <= 0) {
+			return;
+		}
+
+		this.imageRefreshTimer = setInterval(() => {
+			if (!this.overlayOpen) {
+				return;
+			}
+
+			const image = document.querySelector(
+				".mmm-fintraffic-cameras__overlay .mmm-fintraffic-cameras__image"
+			);
+
+			if (!image) {
+				return;
+			}
+
+			const camera = this.cameraData?.cameras.find(
+				(item) => item.id === this.selectedCameraId
+			);
+
+			const preset = camera?.presets.find(
+				(item) => item.id === this.selectedPresetId
+			);
+
+			if (preset) {
+				image.src = `${preset.imageUrl}?t=${Date.now()}`;
+			}
+		}, this.config.imageRefreshInterval);
+	},
+
+	stopImageRefresh () {
+		if (this.imageRefreshTimer !== null) {
+			clearInterval(this.imageRefreshTimer);
+			this.imageRefreshTimer = null;
+		}
+	},
+
+	startDataRefresh () {
+		this.stopDataRefresh();
+
+		if (this.config.dataRefreshInterval <= 0) {
+			return;
+		}
+
+		this.dataRefreshTimer = setInterval(() => {
+			if (!this.overlayOpen) {
+				return;
+			}
+
+			this.sendSocketNotification("FINTRAFFIC_GET_CAMERAS", {
+				cameras: this.config.cameras
+			});
+		}, this.config.dataRefreshInterval);
+	},
+
+	stopDataRefresh () {
+		if (this.dataRefreshTimer !== null) {
+			clearInterval(this.dataRefreshTimer);
+			this.dataRefreshTimer = null;
+		}
 	},
 
 	createOverlay () {
@@ -90,12 +168,18 @@ Module.register("MMM-FintrafficCameras", {
 		const content = document.createElement("div");
 		content.className = "mmm-fintraffic-cameras__content";
 
-		if (this.errorMessage) {
-			content.textContent = this.errorMessage;
-		} else if (!this.cameraData) {
-			content.textContent = "Ladataan kameratietoja…";
+		if (!this.cameraData) {
+			content.textContent = this.errorMessage
+				|| "Ladataan kameratietoja…";
 		} else {
 			content.appendChild(this.createCameraView());
+
+			if (this.errorMessage) {
+				const warning = document.createElement("div");
+				warning.className = "mmm-fintraffic-cameras__warning";
+				warning.textContent = this.errorMessage;
+				content.appendChild(warning);
+			}
 		}
 
 		panel.appendChild(closeButton);
@@ -355,6 +439,10 @@ Module.register("MMM-FintrafficCameras", {
 	},
 
 	socketNotificationReceived (notification, payload) {
+		if (!this.overlayOpen) {
+			return;
+		}
+
 		if (notification === "FINTRAFFIC_CAMERAS") {
 			this.cameraData = payload;
 			this.errorMessage = null;
@@ -362,7 +450,6 @@ Module.register("MMM-FintrafficCameras", {
 		}
 
 		if (notification === "FINTRAFFIC_CAMERAS_ERROR") {
-			this.cameraData = null;
 			this.errorMessage =
 				`Kameratietojen lataaminen epäonnistui: ${payload.message}`;
 			this.updateDom();
