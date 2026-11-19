@@ -1,9 +1,13 @@
+
 # Roadmap
 
 ## v0.1 - Initial MVP
 
 Goal: provide a simple and reliable MagicMirror² interface for selected
 Fintraffic road weather cameras and their related road weather observations.
+
+The core functionality has been implemented and tested with MagicMirror².
+The remaining work focuses on reliability, documentation, and release readiness.
 
 ### Project foundation
 
@@ -14,49 +18,55 @@ Fintraffic road weather cameras and their related road weather observations.
 - [x] Verify current road weather observations
 - [x] Verify sensor-specific road weather history
 - [x] Define initial architecture
-- [ ] Create initial MagicMirror² module files
+- [x] Create initial MagicMirror² module files
 - [ ] Add development configuration and tooling
 
 ### Camera data
 
-- [ ] Read configured camera station IDs
-- [ ] Fetch camera station metadata
-- [ ] Filter unavailable camera presets
-- [ ] Support multiple presets per camera station
-- [ ] Display the selected camera image
+- [x] Read configured camera station IDs
+- [x] Fetch camera station metadata
+- [x] Filter unavailable camera presets
+- [x] Support multiple presets per camera station
+- [x] Display the selected camera image
 - [ ] Handle unavailable camera images gracefully
 
 ### Road weather data
 
-- [ ] Use `nearestWeatherStationId` from camera metadata
-- [ ] Fetch current road weather observations
-- [ ] Normalize relevant sensor values
-- [ ] Display available air temperature
-- [ ] Display available road surface temperature
-- [ ] Display available road condition
-- [ ] Display available precipitation type and intensity
-- [ ] Display available wind speed and gust
-- [ ] Display available visibility
-- [ ] Omit unavailable measurements gracefully
+- [x] Use `nearestWeatherStationId` from camera metadata
+- [x] Fetch current road weather observations
+- [x] Normalize relevant sensor values
+- [x] Display available air temperature
+- [x] Display available road surface temperature
+- [ ] Investigate and implement available road condition data
+- [x] Display available precipitation type and intensity
+- [x] Display available wind speed and gust
+- [x] Display available visibility
+- [x] Omit unavailable measurements gracefully
+- [x] Display available wind direction
+- [x] Display available 24-hour precipitation total
 
 ### User interface
 
-- [ ] Add a button for opening the camera interface
-- [ ] Add camera station selection
-- [ ] Add preset selection
-- [ ] Add camera overlay
-- [ ] Add road weather information panel
-- [ ] Add close/back controls
-- [ ] Ensure the interface works on a typical MagicMirror display
+- [x] Add a button for opening the camera interface
+- [x] Add camera station selection
+- [x] Add preset selection
+- [x] Add camera overlay
+- [x] Add road weather information panel
+- [x] Add close controls
+- [x] Verify the interface in a desktop browser
+- [x] Verify the interface on an 800x1280 MagicMirror touchscreen
+- [ ] Improve overlay overflow handling for smaller displays
 
 ### API behaviour
 
-- [ ] Add appropriate Digitraffic request headers
-- [ ] Avoid unnecessary API requests
-- [ ] Respect camera and weather data update intervals
-- [ ] Add API error handling
-- [ ] Add loading states
-- [ ] Add Fintraffic data attribution
+- [x] Add appropriate Digitraffic request headers
+- [x] Avoid continuous API requests while the overlay is closed
+- [x] Add configurable image refresh interval (default: 60 seconds)
+- [x] Add configurable camera and weather refresh interval (default: 5 minutes)
+- [x] Add basic API error handling
+- [x] Add loading states
+- [x] Preserve previously loaded data when a refresh fails
+- [ ] Add Fintraffic data attribution to the interface
 
 ### Documentation
 
@@ -64,7 +74,9 @@ Fintraffic road weather cameras and their related road weather observations.
 - [ ] Document configuration
 - [ ] Add example configuration
 - [ ] Document supported road weather values
+- [ ] Update architecture documentation to reflect the implementation
 - [ ] Add screenshots after the UI is stable
+- [ ] Prepare v0.1 release notes
 
 ## v0.2 - Historical road weather graphs
 
@@ -77,12 +89,20 @@ Fintraffic road weather cameras and their related road weather observations.
 
 ## Later development
 
-Possible future features:
+### Reliability and optimization
 
-- historical road weather camera images
-- additional road weather measurements
-- configurable weather panel fields
-- map-based camera discovery
-- larger camera directories
-- improved camera browsing and filtering
-- localization
+- [ ] Consider caching precipitation sensor value descriptions
+- [ ] Consider handling individual camera failures independently
+- [ ] Avoid unnecessary JPEG reloads during weather data updates
+- [ ] Make the overlay independent of its MagicMirror region
+- [ ] Improve defensive handling of incomplete API responses
+
+### Possible future features
+
+- Historical road weather camera images
+- Additional road weather measurements
+- Configurable weather panel fields
+- Map-based camera discovery
+- Larger camera directories
+- Improved camera browsing and filtering
+- Localization
