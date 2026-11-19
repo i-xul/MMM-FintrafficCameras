@@ -322,12 +322,29 @@ Module.register("MMM-FintrafficCameras", {
 		);
 
 		if (selectedPreset) {
-			const image = document.createElement("img");
-			image.className = "mmm-fintraffic-cameras__image";
-			image.src = `${selectedPreset.imageUrl}?t=${Date.now()}`;
-			image.alt = `${camera.name} – ${selectedPreset.name}`;
+		const image = document.createElement("img");
+		image.className = "mmm-fintraffic-cameras__image";
+		image.alt = `${camera.name} – ${selectedPreset.name}`;
 
-			container.appendChild(image);
+		const imageError = document.createElement("div");
+		imageError.className = "mmm-fintraffic-cameras__image-error";
+		imageError.textContent = "Kamerakuvaa ei saatavilla";
+		imageError.hidden = true;
+
+		image.addEventListener("error", () => {
+		image.hidden = true;
+		imageError.hidden = false;
+		});
+
+		image.addEventListener("load", () => {
+		image.hidden = false;
+		imageError.hidden = true;
+		});
+
+		image.src = `${selectedPreset.imageUrl}?t=${Date.now()}`;
+
+		container.appendChild(image);
+		container.appendChild(imageError);
 		}
 
 		if (camera.weather) {
