@@ -182,9 +182,14 @@ Module.register("MMM-FintrafficCameras", {
 			}
 		}
 
+		const attribution = document.createElement("div");
+		attribution.className = "mmm-fintraffic-cameras__attribution";
+		attribution.textContent = "Lähde: Fintraffic / Digitraffic";
+
 		panel.appendChild(closeButton);
 		panel.appendChild(title);
 		panel.appendChild(content);
+		panel.appendChild(attribution);
 		overlay.appendChild(panel);
 
 		return overlay;

@@ -28,7 +28,7 @@ The remaining work focuses on reliability, documentation, and release readiness.
 - [x] Filter unavailable camera presets
 - [x] Support multiple presets per camera station
 - [x] Display the selected camera image
-- [ ] Handle unavailable camera images gracefully
+- [x] Handle unavailable camera images gracefully
 
 ### Road weather data
 
@@ -66,7 +66,7 @@ The remaining work focuses on reliability, documentation, and release readiness.
 - [x] Add basic API error handling
 - [x] Add loading states
 - [x] Preserve previously loaded data when a refresh fails
-- [ ] Add Fintraffic data attribution to the interface
+- [x] Add Fintraffic data attribution to the interface
 
 ### Documentation
 
