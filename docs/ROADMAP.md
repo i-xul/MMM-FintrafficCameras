@@ -37,7 +37,7 @@ The remaining work focuses on reliability, documentation, and release readiness.
 - [x] Normalize relevant sensor values
 - [x] Display available air temperature
 - [x] Display available road surface temperature
-- [ ] Investigate and implement available road condition data
+- [x] Investigate and implement available road condition data
 - [x] Display available precipitation type and intensity
 - [x] Display available wind speed and gust
 - [x] Display available visibility

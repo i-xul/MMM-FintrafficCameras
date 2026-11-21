@@ -130,6 +130,17 @@ module.exports = NodeHelper.create({
 
 		const getValue = (sensorId) => values.get(sensorId)?.value ?? null;
 
+		const roadConditionSensors = [27, 28];
+
+		const roadCondition = roadConditionSensors
+			.map((sensorId) => values.get(sensorId))
+			.find((sensor) => (
+				 sensor &&
+				 Number(sensor.value) >= 1 &&
+				 Number(sensor.value) <= 9 &&
+				 sensor.sensorValueDescriptionFi
+			))?.sensorValueDescriptionFi ?? null;
+
 		const precipitationTypeValue = getValue(25);
 
 		return {
@@ -137,6 +148,7 @@ module.exports = NodeHelper.create({
 			dataUpdatedTime: data.dataUpdatedTime,
 			airTemperature: getValue(1),
 			roadTemperature: getValue(3),
+			roadCondition,
 			windSpeed: getValue(16),
 			windGust: getValue(17),
 			windDirection: getValue(18),

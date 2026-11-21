@@ -406,6 +406,7 @@ Module.register("MMM-FintrafficCameras", {
 		const measurements = [
 			["Ilma", weather.airTemperature, "°C"],
 			["Tienpinta", weather.roadTemperature, "°C"],
+			["Tienpinnan tila", weather.roadCondition, ""],
 			["Tuuli", weather.windSpeed, "m/s"],
 			["Puuska", weather.windGust, "m/s"],
 			["Tuulensuunta", this.formatWindDirection(weather.windDirection), ""],
