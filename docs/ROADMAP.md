@@ -55,7 +55,7 @@ The remaining work focuses on reliability, documentation, and release readiness.
 - [x] Add close controls
 - [x] Verify the interface in a desktop browser
 - [x] Verify the interface on an 800x1280 MagicMirror touchscreen
-- [ ] Improve overlay overflow handling for smaller displays
+- [x] Improve overlay overflow handling for smaller displays
 
 ### API behaviour
 
